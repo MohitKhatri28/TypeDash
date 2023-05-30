@@ -5,13 +5,14 @@ import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
+import {Link} from 'react-router-dom'; 
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { Collapse, FormControl, Alert } from '@mui/material';
 
 function Copyright(props) {
   return (
@@ -34,7 +35,7 @@ export default function LogIn() {
     
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
+    const [error, setError] = useState("");
     // const handleSubmit = (event) => {
     //     event.preventDefault();
     //     const data = new FormData(event.currentTarget);
@@ -44,10 +45,20 @@ export default function LogIn() {
     //     });
     // };
 
-    const submitPressed = () => {
-        console.log(email);
-        console.log(password);
-    } 
+    const submitPressed = (e) => {
+        e.preventDefault();
+        const requestOptions = {
+          method: "POST",
+          headers: { "Content-Type": "application/json"},
+          body: JSON.stringify({
+            username: email,
+            password: password,
+          }),
+        }
+        fetch("/api/login", requestOptions)
+          .then((response) => response.json())
+          .then((data) => console.log(data));
+    }; 
 
     return (
         <ThemeProvider theme={defaultTheme}>
@@ -67,7 +78,17 @@ export default function LogIn() {
             <Typography component="h1" variant="h5">
                 Sign in
             </Typography>
-            <Box component="form" noValidate sx={{ mt: 1 }}>
+            <Collapse in={error != ""}>
+                <Alert
+                  severity="error"
+                  onClose={() => {
+                    setError("");
+                  }}
+                >
+                  {error}
+                </Alert>
+            </Collapse>
+            <Box component="form" sx={{ mt: 1 }}>
                 <TextField
                 margin="normal"
                 required
@@ -103,12 +124,12 @@ export default function LogIn() {
                 </Button>
                 <Grid container>
                 <Grid item xs>
-                    <Link href="/password-reset" variant="body2">
+                    <Link to="/password-reset" variant="body2">
                     Forgot password?
                     </Link>
                 </Grid>
                 <Grid item>
-                    <Link href="/sign-up" variant="body2">
+                    <Link to="/sign-up" variant="body2">
                     {"Don't have an account? Sign Up"}
                     </Link>
                 </Grid>

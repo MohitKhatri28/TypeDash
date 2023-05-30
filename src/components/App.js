@@ -9,22 +9,18 @@ import {
 import { useEffect } from 'react';
 import LogIn from './auth/login';
 import SignUp from './auth/signup';
+import PasswordReset from './auth/passwordreset';
 function App() {
-
-  useEffect(() => {
-    fetch('/api/login')
-      .then((response) => response.json())
-      .then((data) => console.log(data));
-  }, []);
 
   return (
     <Router>
       <Routes>
-        <Route path="/">
+        <Route path="/"element={<p>Home</p>}  >
           Home
         </Route>
         <Route path="/login" element={<LogIn/>} />
         <Route path="/sign-up" element={<SignUp/>} />
+        <Route path="/password-reset" element={<PasswordReset/>} />
       </Routes>
     </Router>
   );
