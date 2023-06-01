@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify
 from . import guard, db, cors, User 
+import flask_praetorian 
+import flask_cors  
 
 views = Blueprint('views', __name__)
 
@@ -11,7 +13,7 @@ def login():
     """
     req = request.get_json(force=True)
     username = req.get('username', None)
-    print(User.query.filter_by(username=username).first())
+    #print(User.query.filter_by(username=username).first())
     password = req.get('password', None)
     user = guard.authenticate(username, password)
     ret = {'access_token': guard.encode_jwt_token(user)}
@@ -38,3 +40,16 @@ def refresh():
     new_token = guard.refresh_jwt_token(old_token)
     ret = {'access_token': new_token}
     return ret, 200
+
+@views.route('/protected')
+@flask_praetorian.auth_required
+def protected():
+    """
+    A protected endpoint. The auth_required decorator will require a header
+    containing a valid JWT
+    .. example::
+       $ curl http://localhost:5000/api/protected -X GET \
+         -H "Authorization: Bearer <your_token>"
+    """
+    return {'message': f'protected endpoint (allowed user {flask_praetorian.current_user().username})'}
+

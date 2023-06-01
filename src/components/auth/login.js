@@ -5,7 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import {Link} from 'react-router-dom'; 
+import {Link, useNavigate} from 'react-router-dom'; 
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
@@ -31,11 +31,13 @@ function Copyright(props) {
 
 const defaultTheme = createTheme();
 
-export default function LogIn() {
+export default function LogIn(props) {
     
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [token, setToken] = useState("");
+    let navigate = useNavigate();
     // const handleSubmit = (event) => {
     //     event.preventDefault();
     //     const data = new FormData(event.currentTarget);
@@ -56,8 +58,37 @@ export default function LogIn() {
           }),
         }
         fetch("/api/login", requestOptions)
-          .then((response) => response.json())
-          .then((data) => console.log(data));
+          .then((response) => {
+            if(response.ok) 
+              return response.json();
+            else {
+              setError(response.error);
+              return {};
+            }
+
+          })
+          .then((data) => {
+            if ("access_token" in data) {
+              setToken(data["access_token"]);
+              navigate('/');
+            }
+            else {
+              setError("No access token received from server.")
+            } 
+
+            // const options = {
+            //   method: "GET",
+            //   headers: {
+            //     Authorization: "Bearer " + token,
+            //   },
+            // };
+
+
+            // fetch("/api/protected", options)
+            //   .then((response) => response.json())
+            //   .then((data) => console.log(data));
+        
+          });
     }; 
 
     return (
